@@ -1,0 +1,47 @@
+\documentclass{amsart}
+\usepackage[utf8]{inputenc}
+
+\title{Truth Table}
+\author{Allen Williams' Truth Table Generator }
+\date{\today}
+
+\usepackage{booktabs}
+\usepackage{dcolumn}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage[pdftex]{graphicx}
+\usepackage{scrextend}
+
+\makeatletter
+\newcommand{\thickhline}{%
+    \noalign {\ifnum 0=`}\fi \hrule height 1pt
+    \futurelet \reserved@a \@xhline
+}
+\newcolumntype{"}{@{\hskip\tabcolsep\vrule width
+1pt\hskip\tabcolsep}}
+\makeatother
+
+\begin{document}
+
+\maketitle
+
+\begin{table}[H]
+    \caption{Truth Table for P$\land$ (Q$\implies$ S) }
+\centering
+\resizebox*{\textwidth}{!}{\begin{tabular}{c"c|c|c|c}
+P & Q & S & Q$\implies$ S & P$\land$ (Q$\implies$ S) \\ \thickhline
+F & F & F & T & F \\
+F & F & T & T & F \\
+F & T & F & F & F \\
+F & T & T & T & F \\
+T & F & F & T & T \\
+T & F & T & T & T \\
+T & T & F & F & F \\
+T & T & T & T & T \\
+\end{tabular}}
+\end{table}
+
+P$\land$ (Q$\implies$ S) has disjunctive normal form (P$\land$ $\lnot$ Q$\land$ $\lnot$ S)$\lor$ (P$\land$ $\lnot$ Q$\land$ S)$\lor$ (P$\land$ Q$\land$ S)\\
+\\P$\land$ (Q$\implies$ S) can be simplified to (P$\land$ $\lnot$ Q)$\lor$ (P$\land$ S)\end{document}

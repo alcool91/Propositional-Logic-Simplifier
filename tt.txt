@@ -1,0 +1,16 @@
+P	Q	S	Q⇒S	P∧(Q⇒S)	
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+F	F	F	T	F	
+F	F	T	T	F	
+F	T	F	F	F	
+F	T	T	T	F	
+T	F	F	T	T	
+T	F	T	T	T	
+T	T	F	F	F	
+T	T	T	T	T	
+Disjunctive Normal Form : (P∧¬Q∧¬S)∨(P∧¬Q∧S)∨(P∧Q∧S)
+Simplified Form : (P∧¬Q)∨(P∧S)
+
+
+Install LaTeX for a better experience, or take the file "tt.tex" in this directory
+to sharelatex.com

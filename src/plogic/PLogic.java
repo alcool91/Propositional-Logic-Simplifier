@@ -104,7 +104,7 @@ public class PLogic {
         for (int i = 0; i < minterms.length; i++) {
             int ones = countOnes(minterms[i]);
             groups[ones][step].add(new Minterm(minterms[i]));
-        };
+        }
         for(int j = 0; j < groups[0].length; j++) {
             for(int i = 0; i < groups.length; i++){
                 for(Minterm k: groups[i][j]) {
@@ -154,11 +154,6 @@ public class PLogic {
                 } else tab[p][s]="F";
             }
         }
-        /*for(int i = 0; i < primes.size(); i++) {
-            for(int j = 0; j < minterms.length; j++) {
-                System.out.print(tab[i][j] + " ");
-            } System.out.println();
-        }*/
         //Narrow primes down to essential primes
         for(int i = 0; i < minterms.length; i++) {
             boolean one = false;
@@ -217,11 +212,6 @@ public class PLogic {
                 }
             }
         }
-        /*for(int i = 0; i < primes.size(); i++) {
-            for(int j = 0; j < minterms.length; j++) {
-                System.out.print(tab[i][j] + " ");
-            } System.out.println();
-        }*/
         StringBuilder toReturn = new StringBuilder();
         for(int p = 0; p < eprimes.size(); p++) {
             char[] a = eprimes.get(p).term.toCharArray();
@@ -251,7 +241,7 @@ public class PLogic {
             desktop=Desktop.getDesktop();
         } desktop.open(F);
     }
-    public static String getCNF(String[][] tt, int numRows, int numCols, 
+    public static String getDNF(String[][] tt, int numRows, int numCols, 
             int numProps) {
         StringBuilder toReturn = new StringBuilder();
         List<String> minterms = new ArrayList<>();
@@ -261,7 +251,7 @@ public class PLogic {
                 for(int j = 0; j<numProps; j++) {
                     if(tt[i][j].equals("T")) {a.append(tt[0][j]);}
                     else if (tt[i][j].equals("F")) {a.append("\u00AC"+tt[0][j]);}
-                    else System.out.print("Something went wrong finding CNF");
+                    else System.out.print("Something went wrong finding DNF");
                     if(j<numProps-1) {a.append("\u2227");}
                 } minterms.add(a.toString());
             }
@@ -357,15 +347,13 @@ public class PLogic {
     public static void main(String[] args) throws FileNotFoundException,
             IOException,
             InterruptedException {
-       Stack<Character> op  = new Stack<Character>();
-       Stack<String> val = new Stack<String>();
-       Stack<String> evalStack = new Stack<String>();
-       Queue<String> valq2 = new Queue<String>();
-       Queue<String> valq = new Queue<String>();
-       ArrayList<Character> propositions = new ArrayList<Character>();
-       List<String> steps = new ArrayList<String>();
+       Stack<String> evalStack = new Stack<>();
+       Queue<String> valq2 = new Queue<>();
+       Queue<String> valq = new Queue<>();
+       ArrayList<Character> propositions = new ArrayList<>();
+       List<String> steps = new ArrayList<>();
        Scanner stdin = new Scanner(System.in);
-       String s, cnf, simp;
+       String s, dnf, simp;
        char t;
        System.out.print("Enter Expression (Use \"&\" for \u2227, \"|\" for"+
                " \u2228,\n "+
@@ -374,18 +362,6 @@ public class PLogic {
        s = stdin.nextLine();
        s = replaceOperators(s);
        fillPropositions(s, propositions);
-       for(int i = 0; i < s.length(); i++) {
-           char p = s.charAt(i);
-           if (isProp(p)) {
-               if((0x40 < p) && (0x5B>p)) {
-                   val.push(Character.toString(p));
-               }
-               else if ((0x60 < p) && (0x7B>p)) {
-                   val.push(Character.toString((char)(p-0x20)));
-               }
-           }
-           else op.push(p);
-       }
        //Generate PostFix Queue
        convertToPostfix(s, valq);
        valq2 = valq.Copy();
@@ -513,15 +489,15 @@ public class PLogic {
             } System.out.println();
             txtOut.println();
        }
-       cnf = getCNF(fileMatrix, (int)Math.pow(2, n)+1, 
+       dnf = getDNF(fileMatrix, (int)Math.pow(2, n)+1, 
                 n+steps.size(),n);
        simp = quineMcCluskey(fileMatrix,(int)Math.pow(2, n)+1,
-                n+steps.size(),n,cnf);
+                n+steps.size(),n,dnf);
        writeFile("tt.tex", fileMatrix,(int)Math.pow(2, n)+1,n+steps.size(),
-                    fileMatrix[0][n+steps.size()-1],n, convertToLaTeX(cnf), 
+                    fileMatrix[0][n+steps.size()-1],n, convertToLaTeX(dnf), 
                     convertToLaTeX(simp));     
-        System.out.println(cnf);
-        txtOut.println("Disjunctive Normal Form : " + cnf);
+        System.out.println(dnf);
+        txtOut.println("Disjunctive Normal Form : " + dnf);
         System.out.println(simp);
         txtOut.println("Simplified Form : " + simp);
         txtOut.println("\n\nInstall LaTeX for a better experience, or take "+

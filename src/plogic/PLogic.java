@@ -5,6 +5,7 @@ import java.util.*;
 
 public class PLogic {
     public static String convertToLaTeX(String s) {
+       //Replace unicode characters with latex equivalents
        String a = s;
        a = a.replace("\u21D2", "$\\implies$ ");
        a = a.replace("\u2227", "$\\land$ ");
@@ -19,6 +20,7 @@ public class PLogic {
             int numRows, int numCols, 
             String func, int numProps, String cnf, String simp) 
             throws FileNotFoundException {
+        //Write LaTeX file 
         File F = new File(FileName);
         PrintStream Out = new PrintStream(F);
         final String PREAMBLE = "\\documentclass{amsart}\n"+""
@@ -64,6 +66,7 @@ public class PLogic {
         Out.close();
     }
     public static ArrayList<Integer> diff(String a, String b) {
+        //Given two strings of equal length find the indices where they differ
         ArrayList<Integer> differences = new ArrayList<>();
         for(int i = 0; i < a.length(); i++) {
             if (a.charAt(i)!=b.charAt(i)) {
@@ -72,6 +75,7 @@ public class PLogic {
         } return differences;
     }
     public static int countOnes(String a) {
+        //Given a string return the number of ones in that string
         int ones = 0;
         for(int i = 0; i < a.length(); i++) {
             if(a.charAt(i)=='1') ones++;
@@ -79,6 +83,7 @@ public class PLogic {
     }
     public static String quineMcCluskey(String[][] tt, int numRows, int numCols,
             int numProps, String cnf) {
+        //Simplification algorithm for boolean expression
         if (cnf.equals("")) { return "F"; }
         String[] minterms = cnf.split("\u2228");
         ArrayList<Minterm>[][] groups = new ArrayList[numProps+1][numProps+1];
@@ -105,6 +110,8 @@ public class PLogic {
             int ones = countOnes(minterms[i]);
             groups[ones][step].add(new Minterm(minterms[i]));
         }
+        //Find minterms that differ in only one place from each other and
+        //combine them, using X to mark the spot where they differ
         for(int j = 0; j < groups[0].length; j++) {
             for(int i = 0; i < groups.length; i++){
                 for(Minterm k: groups[i][j]) {
@@ -120,6 +127,9 @@ public class PLogic {
                             term = k.term;
                             newTerm = new StringBuilder(term);
                             newTerm.setCharAt(diff(k.term,l.term).get(0),'X');
+                            //when two minterms are combined, create a new 
+                            //minterm which has both of the previous minterms
+                            //values
                             Minterm t = new Minterm(newTerm.toString());
                             for (int v:k.value) {
                                 t.value.add(v);
@@ -128,6 +138,8 @@ public class PLogic {
                                 t.value.add(v);
                             }
                             groups[i][j+1].add(t);
+                            //check the minterms so they cannot be prime
+                            //implicants
                             k.checked = true;
                             l.checked = true;
                         }
@@ -135,7 +147,7 @@ public class PLogic {
                 } 
             }
         }
-        
+        //Add unchecked minterms above to the list of prime implicants
         for(int i = 0; i < groups.length; i++) {
             for(int j = 0; j < groups[i].length; j++){
                 for(Minterm k: groups[i][j]) {
@@ -145,6 +157,7 @@ public class PLogic {
                 }
             }
         }
+        //Create minterm table describing which minterms cover which values
         ArrayList<Minterm> eprimes = new ArrayList<>();
         String[][] tab = new String[primes.size()][minterms.length];
         for(int p = 0; p < primes.size(); p++) {
@@ -166,6 +179,8 @@ public class PLogic {
                     index = j;
                 }
             }if((one) && (onlyOne)) {
+                //If only one minterm covers any value, that minterm is
+                //essential
                     eprimes.add(primes.get(index));
                     for(int j=0;j<minterms.length;j++) {
                         tab[index][j] = "X";
@@ -173,6 +188,7 @@ public class PLogic {
             }
             
         }
+        //find and eliminate rows that are dominated by other rows.
         for (int i = 0; i < primes.size(); i++) {
             for (int j = 0; j < primes.size(); j++) {
                 if (i!=j) {
@@ -202,6 +218,7 @@ public class PLogic {
                 }
             }
         }
+        //Add all essential prime implicants to a list
         for(int i = 0; i < primes.size(); i++) {
             boolean added=false;
             for(int j = 0; j < minterms.length; j++)
@@ -213,6 +230,8 @@ public class PLogic {
             }
         }
         StringBuilder toReturn = new StringBuilder();
+        //Print out the essential prime implicants
+        //Convert from string of 1s, 0s, and Xs back into propositions
         for(int p = 0; p < eprimes.size(); p++) {
             char[] a = eprimes.get(p).term.toCharArray();
             int sizea=0;
@@ -235,6 +254,8 @@ public class PLogic {
     }
         
     public static void readFile(String fileName) throws IOException {
+        //Open a file with the desktops preferred application for that type
+        //of file
         File F = new File(fileName);
         Desktop desktop = null;
         if (desktop.isDesktopSupported()) {
@@ -243,6 +264,8 @@ public class PLogic {
     }
     public static String getDNF(String[][] tt, int numRows, int numCols, 
             int numProps) {
+        //Disjunctive normal form is taken directly from the matrix containing
+        //truth table values
         StringBuilder toReturn = new StringBuilder();
         List<String> minterms = new ArrayList<>();
         for(int i = 1; i < numRows; i++) {
@@ -269,16 +292,21 @@ public class PLogic {
         } return toReturn.toString();
     }
     public static boolean isProp(char c) {
+        //alphabetic characters allowed as propositions
         return ((0x40 < c) && (0x5B > c) || (0x60 < c) && (0x7B > c));
     }
     public static boolean isBin(char c) {
+        //returns true if the character is a unicode character for a binary
+        //connective
         return ((c=='\u2227')||(c=='\u2228')||(c=='\u2295')||(c=='\u21D2')  
                || (c=='\u21D4'));
     }
     public static boolean isUn(char c){
+        //returns true if the character is a unary connective
         return (c=='\u00AC');
     }
     public static TTBool evalLogic(TTBool p, TTBool q, char op) {
+        //Evaluate logical expressions and, or, xor, implies, equivalence
     TTBool result;
     if      (op == '\u2227') result = new TTBool(p.value && q.value);
     else if (op == '\u2228') result = new TTBool(p.value || q.value);
@@ -291,12 +319,14 @@ public class PLogic {
     return result;
     }
     public static TTBool evalLogic(TTBool p, char op) {
+        //evaluate negation
         TTBool result;
         if (op == '\u00AC') result = new TTBool(!p.value);
         else throw new IllegalArgumentException("Unknown Unary Operator");
         return result;
     }
     public static String replaceOperators(String s) {
+        //Replace allowed keyboard characters with unicode logical operators
        s = s.replace(">", "\u21D2");
        s = s.replace("&", "\u2227");
        s = s.replace("|", "\u2228");
@@ -307,6 +337,7 @@ public class PLogic {
     }
     public static ArrayList<Character> fillPropositions(String s, 
             ArrayList<Character> propositions) {
+        //Take the propositions from user's input and store them
         char t;
         for (int i = 0; i < s.length(); i++) {
            t = s.charAt(i);
@@ -319,6 +350,8 @@ public class PLogic {
        } return propositions;
     }
     public static Queue<String> convertToPostfix(String s, Queue<String> valq) {
+        //Take an infix expression and return a queue containing a postfix
+        //expression
         Stack<Character> tstack = new Stack<Character>();
         for(int i = 0; i < s.length(); i++) {
            char m = s.charAt(i);
@@ -504,6 +537,7 @@ public class PLogic {
                 "the file \"tt.tex\" in this directory\nto sharelatex.com");
         txtOut.close();
         try {
+            //Try to use pdflatex to convert tex file to pdf and open it
             Process proc = 
                 Runtime.getRuntime().exec("/Library/TeX/texbin/pdflatex tt.tex");
             BufferedReader Reader = 
@@ -517,6 +551,7 @@ public class PLogic {
             proc.waitFor();
             readFile("tt.pdf");
         } catch(Exception e) {
+            //if the tex file cannot be converted, open txt file
             readFile("tt.txt");
         }
     }

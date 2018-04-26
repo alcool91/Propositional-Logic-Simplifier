@@ -1,4 +1,4 @@
-import cloudconvert.api
+import cloudconvert.cloudconvert.api
 
 api = cloudconvert.Api('nS9gRTrGq0r2ozqaG7jpkJmtdmcx944OW5bburss-VaTlbgwJ6huAdVlx76Cd9TrkhiZTyUqfn0lXntKoHrHjQ')
 

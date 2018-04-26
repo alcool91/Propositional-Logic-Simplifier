@@ -377,6 +377,19 @@ public class PLogic {
        } while(!tstack.isEmpty()) valq.enqueue(Character.toString(tstack.pop()));
         return valq;
     }
+    public static String getPath(String filename) throws FileNotFoundException {
+        String path;
+        File F = new File(filename);
+        Scanner fileIn = new Scanner(F);
+        path=fileIn.nextLine();
+        return path;
+    }
+    public static void writePath(String pathName) throws FileNotFoundException {
+        File F = new File("LaTeXPath.txt");
+        PrintStream P = new PrintStream(F);
+        P.print(pathName);
+        P.close();
+    }
     public static void main(String[] args) throws FileNotFoundException,
             IOException,
             InterruptedException {
@@ -386,13 +399,33 @@ public class PLogic {
        ArrayList<Character> propositions = new ArrayList<>();
        List<String> steps = new ArrayList<>();
        Scanner stdin = new Scanner(System.in);
-       String s, dnf, simp;
+       String s, dnf, simp, conf, LaTeXpath;
        char t;
+       boolean local_conversion=false;
+       LaTeXpath=getPath("LaTeXPath.txt");
+       do {
        System.out.print("Enter Expression (Use \"&\" for \u2227, \"|\" for"+
                " \u2228,\n "+
                " \">\" for \u21D2, \"!\" for \u00AC, \"*\" for \u2295, and \"=\" for "
                + "\u21D4.  \nPlease include all necessary parentheses): ");
        s = stdin.nextLine();
+       if (s.equalsIgnoreCase("l")) {
+           System.out.print("Use local Conversion? >> (Y/N) ");
+           conf = stdin.next();
+           stdin.nextLine();
+           if (conf.equalsIgnoreCase("Y")) {
+               local_conversion=true;
+               System.out.print("\nUsing Local Conversion.  Use command \"p\" "
+                       + "to provide a path to pdfLaTeX\n");
+           } 
+       }
+       else if (s.equalsIgnoreCase("d")) {
+           System.out.print("\nPath to pdfLaTeX >> ");
+           LaTeXpath = stdin.next();
+           stdin.nextLine();
+       }
+       } while ((s.equalsIgnoreCase("l")) || (s.equalsIgnoreCase("p")));
+       
        s = replaceOperators(s);
        fillPropositions(s, propositions);
        //Generate PostFix Queue
@@ -538,8 +571,13 @@ public class PLogic {
         txtOut.close();
         try {
             //Try to use pdflatex to convert tex file to pdf and open it
-            Process proc = 
-                Runtime.getRuntime().exec("/Library/TeX/texbin/pdflatex tt.tex");
+            Process proc;
+            if(!local_conversion) {
+                proc = 
+                Runtime.getRuntime().exec("python ConvAPI.py");
+            } else {
+                proc = Runtime.getRuntime().exec(LaTeXpath + " tt.tex");
+            }
             BufferedReader Reader = 
                     new BufferedReader(new InputStreamReader(proc.getInputStream()));
             String line = "";
@@ -550,6 +588,7 @@ public class PLogic {
             } P.close();
             proc.waitFor();
             readFile("tt.pdf");
+            
         } catch(Exception e) {
             //if the tex file cannot be converted, open txt file
             readFile("tt.txt");
